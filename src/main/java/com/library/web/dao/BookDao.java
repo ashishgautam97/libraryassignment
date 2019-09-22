@@ -8,16 +8,27 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import com.library.web.model.Book;
 
 @Repository
 public class BookDao {
+	
+	@Value("${spring.datasource.url}")
+	private String hostUrl;
+	
+	@Value("${spring.datasource.username}")
+	private String username;
+	
+	@Value("${spring.datasource.password}")
+	private String password;
 
 	public List<Book> findAll() {
         List<Book> books = new ArrayList<Book>();
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 			Statement st = null;
 			try {
@@ -58,7 +69,7 @@ public class BookDao {
 	
 	public List<Book> findAllBySearch(String str) {
 		List<Book> books = new ArrayList<Book>();
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 			Statement st = null;
 			try {
@@ -100,7 +111,7 @@ public class BookDao {
 
 	public void deleteBook(int id) {
 		// TODO Auto-generated method stub
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 		    Statement stmt = conn.createStatement();
 		    stmt.execute("DELETE FROM books WHERE id = "+id);
@@ -113,7 +124,7 @@ public class BookDao {
 
 	public void addBook(String name, String isbn, int quantity) {
 		// TODO Auto-generated method stub
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 		    // Statement stmt = conn.createStatement();
 		    PreparedStatement stmt=conn.prepareStatement("insert into books(name,isbn,quantity) values(?,?,?)");  
@@ -132,7 +143,7 @@ public class BookDao {
 	public Book getBookById(int id) {
 		// TODO Auto-generated method stub
 		Book book = new Book();
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 			Statement st = null;
 			try {
@@ -176,7 +187,7 @@ public class BookDao {
 
 	public void updateBook(int id, String name, String isbn, int quantity) {
 		// TODO Auto-generated method stub
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 		    // Statement stmt = conn.createStatement();
 		    String sql = "update books set name=?,isbn=?,quantity=? where id=?";

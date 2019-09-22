@@ -35,4 +35,9 @@ public class BorrowService {
 		borrow.returnBook(id);
 	}
 
+	public List<Borrow> getUsersToNotify() {
+		// TODO Auto-generated method stub
+		return borrow.getUsersToNotify();
+	}
+
 }

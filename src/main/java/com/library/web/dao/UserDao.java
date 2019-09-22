@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import com.library.web.model.User;
@@ -16,9 +17,19 @@ import com.library.web.model.User;
 @Repository
 public class UserDao {
 
+
+	@Value("${spring.datasource.url}")
+	private String hostUrl;
+	
+	@Value("${spring.datasource.username}")
+	private String username;
+	
+	@Value("${spring.datasource.password}")
+	private String password;
+	
 	public List<User> findAll() {
 		List<User> Users = new ArrayList<User>();
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 			Statement st = null;
 			try {
@@ -58,7 +69,7 @@ public class UserDao {
 
 	public void addUser(String name, Long mobile) {
 		// TODO Auto-generated method stub
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 		    // Statement stmt = conn.createStatement();
 		    PreparedStatement stmt=conn.prepareStatement("insert into users(name,mobile) values(?,?)");  
@@ -76,7 +87,7 @@ public class UserDao {
 	public User getUserById(int id) {
 		// TODO Auto-generated method stub
 		User user = new User();
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 			Statement st = null;
 			try {
@@ -116,7 +127,7 @@ public class UserDao {
 
 	public void updateUser(int id, String name, Long mobile) {
 		// TODO Auto-generated method stub
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 		    // Statement stmt = conn.createStatement();
 		    String sql = "update users set name=?,mobile=? where id=?";
@@ -135,7 +146,7 @@ public class UserDao {
 
 	public void deleteUser(int id) {
 		// TODO Auto-generated method stub
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 		    Statement stmt = conn.createStatement();
 		    stmt.execute("DELETE FROM users WHERE id = "+id);
@@ -149,7 +160,7 @@ public class UserDao {
 	public List<User> getEligibleToIssueUser() {
 		// TODO Auto-generated method stub
 		List<User> Users = new ArrayList<User>();
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 			Statement st = null;
 			try {

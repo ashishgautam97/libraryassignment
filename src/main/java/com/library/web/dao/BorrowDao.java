@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import com.library.web.model.Borrow;
@@ -16,6 +17,15 @@ import com.library.web.model.Borrow;
 @Repository
 public class BorrowDao {
 
+	@Value("${spring.datasource.url}")
+	private String hostUrl;
+	
+	@Value("${spring.datasource.username}")
+	private String username;
+	
+	@Value("${spring.datasource.password}")
+	private String password;
+	
 	public void getDetail(int id) {
 		// TODO Auto-generated method stub
 		
@@ -24,7 +34,7 @@ public class BorrowDao {
 	public List<Borrow> getIssuedBook() {
 		// TODO Auto-generated method stub
 		List<Borrow> borrows = new ArrayList<Borrow>();
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 			Statement st = null;
 			try {
@@ -74,7 +84,7 @@ public class BorrowDao {
 
 	public void addBorrow(int book_id, int user_id, String return_date, String remarks) {
 		// TODO Auto-generated method stub
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 		    // Statement stmt = conn.createStatement();
 		    PreparedStatement stmt=conn.prepareStatement("insert into borrows(book_id,user_id,issue_date,return_date,remarks) values(?,?,now(),?,?)");  
@@ -93,7 +103,7 @@ public class BorrowDao {
 
 	public void returnBook(int id) {
 		// TODO Auto-generated method stub
-		try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/libsys","root","123456")) {
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
 		    System.out.println("Database connected!");
 		    // Statement stmt = conn.createStatement();
 		    String sql = "update borrows set return_on=now() where id=?";
@@ -105,6 +115,49 @@ public class BorrowDao {
 		} catch (SQLException e) {
 		    throw new IllegalStateException("Cannot connect the database!", e);
 		}
+	}
+
+	public List<Borrow> getUsersToNotify() {
+		// TODO Auto-generated method stub
+		List<Borrow> borrows = new ArrayList<Borrow>();
+		try (Connection conn = DriverManager.getConnection(this.hostUrl,this.username,this.password)) {
+		    System.out.println("Database connected!");
+			Statement st = null;
+			try {
+				st = conn.createStatement();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        ResultSet rs = null;
+	        String sql = "SELECT u.name as user, u.mobile as mobile, b.name as book FROM borrows br " + 
+	        		" LEFT JOIN users u ON u.id=br.user_id " + 
+	        		" LEFT JOIN books b ON b.id=br.book_id " + 
+	        		" WHERE br.return_on is Null AND br.issue_date >= DATE(NOW()) - INTERVAL 2 DAY";
+	        try {
+				rs = st.executeQuery( sql );
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			try {
+				while (rs.next()) { 
+					Borrow borrow = new Borrow();
+					borrow.setUser_name(rs.getString(1));
+					borrow.setMobile(rs.getLong(2));
+					borrow.setBook_name(rs.getString(3));
+					borrows.add(borrow);
+				 }
+			    conn.close(); 
+			} catch (NumberFormatException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		} catch (SQLException e) {
+		    throw new IllegalStateException("Cannot connect the database!", e);
+		}
+		return borrows;
 	}
 
 }

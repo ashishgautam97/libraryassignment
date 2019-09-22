@@ -21,6 +21,15 @@ public class Borrow {
 	private String user_name;
 	private Book book;
 	private List<User> users;
+	private Long mobile;
+
+	public Long getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(Long mobile) {
+		this.mobile = mobile;
+	}
 
 	public String getBook_name() {
 		return book_name;
